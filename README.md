@@ -4,6 +4,8 @@ A Flask blueprint for easily integrating with the DIT Authbroker.
 
 # Installation
 
+`pip install -e git://github.com/uktrade/flask-authbroker-client#egg=authbroker_client`
+    
 # Usage
 
 ```from authbroker_client import authbroker_blueprint, login_required
