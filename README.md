@@ -8,7 +8,8 @@ A Flask blueprint for easily integrating with the DIT Authbroker.
     
 # Usage
 
-```from authbroker_client import authbroker_blueprint, login_required
+```
+from authbroker_client import authbroker_blueprint, login_required
 
 app = Flask(...)
 
