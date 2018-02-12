@@ -2,7 +2,7 @@
 
 from distutils.core import setup
 
-setup(name='lask-authbroker-client',
+setup(name='flask-authbroker-client',
       version='0.1',
       description='A blueprint to integrate with the DIT Authbroker client',
       author='Lyndon Garvey',
