@@ -50,6 +50,17 @@ def _get_client():
     return authbroker_client
 
 
+def _get_next_url():
+    if 'next' in request.args:
+        next_url = request.args['next']
+    elif 'next' in session:
+        next_url = session.pop('next', None)
+    else:
+        next_url = '/'
+
+    return next_url
+
+
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -126,7 +137,7 @@ def authorised():
             resp)
     else:
         session[TOKEN_SESSION_KEY] = (resp['access_token'], '')
-        return redirect('/')
+        return redirect(_get_next_url())
 
 
 def get_token():
