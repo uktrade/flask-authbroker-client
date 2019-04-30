@@ -1,6 +1,6 @@
 import logging
 from functools import wraps
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
 
 from werkzeug import security
 from flask import Blueprint, redirect, url_for, session, request, current_app
@@ -48,6 +48,19 @@ def _get_client():
         get_token = authbroker_client.tokengetter(get_token)
 
     return authbroker_client
+
+
+def _is_safe_url(target_url):
+    """
+    Checks if the URL is for our host name.
+
+    Used to protect against redirects to other, potentially malicious, websites.
+
+    Based on http://flask.pocoo.org/snippets/62/
+    """
+    ref_url = urlparse(request.host_url)
+    test_url = urlparse(urljoin(request.host_url, target_url))
+    return test_url.scheme in ('http', 'https') and ref_url.netloc == test_url.netloc
 
 
 def _get_next_url():
@@ -113,6 +126,14 @@ def is_authenticated():
 @authbroker_blueprint.route('/login')
 def login():
     """The login view"""
+    # `next` is added to the query string by @login_required (from above)
+    next_url = request.args.get('next')
+
+    if next_url and _is_safe_url(next_url):
+        # Store the originally-requested URL in the session so that it is picked up
+        # by _get_next_url() when the user returns from ABC
+        session['next'] = next_url
+
     return _get_client().authorize(callback=url_for('auth.authorised', _external=True))
 
 
