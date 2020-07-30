@@ -29,7 +29,16 @@ def _get_client():
     global authbroker_client, get_token
 
     if not authbroker_client:
-        base_url = current_app.config['ABC_BASE_URL']
+        conf = current_app.config
+
+        base_url = conf['ABC_BASE_URL']
+
+        request_token_params = {
+            'state': lambda: security.gen_salt(10)
+        }
+        test_sso_return_token = conf.get('ABC_TEST_SSO_RETURN_ACCESS_TOKEN')
+        if test_sso_return_token:
+            request_token_params['code'] = test_sso_return_token
 
         authbroker_client = oauth.remote_app(
             'authbroker',
@@ -37,12 +46,10 @@ def _get_client():
             request_token_url=None,
             access_token_url=urljoin(base_url, '/o/token/'),
             authorize_url=urljoin(base_url, '/o/authorize/'),
-            consumer_key=current_app.config['ABC_CLIENT_ID'],
-            consumer_secret=current_app.config['ABC_CLIENT_SECRET'],
+            consumer_key=conf['ABC_CLIENT_ID'],
+            consumer_secret=conf['ABC_CLIENT_SECRET'],
             access_token_method='POST',
-            request_token_params={
-                'state': lambda: security.gen_salt(10)
-            }
+            request_token_params=request_token_params,
         )
 
         get_token = authbroker_client.tokengetter(get_token)
