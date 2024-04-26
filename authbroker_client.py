@@ -1,10 +1,20 @@
 import logging
+import warnings
 from functools import wraps
 from urllib.parse import urljoin, urlparse
 
 from werkzeug import security
 from flask import Blueprint, redirect, url_for, session, request, current_app
-from flask_oauthlib.client import OAuth
+
+# ATTENTION: Flask-OAuthLib is deprecated
+# Authlib (https://github.com/lepture/authlib) should be used instead
+try:
+    # newer projects
+    from authlib.integrations.flask_client import OAuth
+except ImportError:
+    # this is a fallback import to allow existing projects time to update Flask/Werkzeug
+    warnings.warn("deprecated", DeprecationWarning)
+    from flask_oauthlib.client import OAuth
 
 
 __all__ = ('authbroker_blueprint', 'NotAuthenticatedError', 'login_required',
